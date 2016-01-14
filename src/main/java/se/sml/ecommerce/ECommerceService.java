@@ -53,7 +53,7 @@ public final class ECommerceService
 		}
 		catch (RepositoryException e)
 		{
-			throw new ECommerceServiceException("Can't update the user, Please try again later");
+			throw new ECommerceServiceException("Can't update the user, Please try again later", e);
 		}
 	}
 
@@ -263,7 +263,7 @@ public final class ECommerceService
 		}
 		else
 		{
-			throw new ECommerceServiceException("Not a correct order");
+			throw new ECommerceServiceException("Order is more than maximum limit of 50000");
 		}
 	}
 

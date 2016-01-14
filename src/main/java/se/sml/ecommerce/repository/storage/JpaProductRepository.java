@@ -104,7 +104,7 @@ public class JpaProductRepository implements ProductRepository {
 			manager.close();
 		}
 		catch (Exception e)	{
-			throw new RepositoryException();
+			throw new RepositoryException(e);
 		}
 	}
 }

@@ -10,9 +10,12 @@
 
 package se.sml.ecommerce.model;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -43,9 +46,10 @@ public final class User
 	@Column(nullable = false)
 	private String status;
 
-//	//Many Order for one User
-//	@OneToMany(mappedBy="user")
-//	private List<Order> order;
+	//Many Order for one User
+//	@ElementCollection
+	@OneToMany(mappedBy="user")
+	private Collection<Order> order;
 	
 	protected User()
 	{
@@ -77,6 +81,11 @@ public final class User
 	{
 		return status;
 	}
+	
+	public Collection<Order> getOrder()
+	{
+		return new HashSet<>(order);
+	}
 
 	public void setUsername(String username)
 	{
@@ -91,13 +100,13 @@ public final class User
 	public void setStatus(String status) throws RepositoryException
 	{
 
-		if (status == "passive" || status == "active")
+		if (status == "Passive" || status == "Active")
 		{
 			this.status = status;
 		}
 		else
 		{
-			throw new RepositoryException("Status must be 'active' or 'passive'");
+			throw new RepositoryException("Status must be 'Active' or 'Passive'");
 		}
 	}
 

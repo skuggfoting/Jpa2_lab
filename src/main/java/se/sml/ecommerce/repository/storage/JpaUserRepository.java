@@ -120,7 +120,7 @@ public class JpaUserRepository implements UserRepository
 				manager.close();
 			}
 			catch (Exception e)	{
-				throw new RepositoryException();
+				throw new RepositoryException(e);
 			}
 		}
 }

@@ -1,9 +1,12 @@
 package se.sml.ecommerce.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -18,6 +21,7 @@ import javax.persistence.Table;
 
 import se.sml.ecommerce.model.OrderRow;
 import se.sml.ecommerce.model.Product;
+import se.sml.ecommerce.repository.checkedexception.RepositoryException;
 
 /*
 - Hämta alla order som har en viss status
@@ -42,25 +46,31 @@ public final class Order
 	private String date;
 	@Column
 	private double sum;
+	@Column
+	private String status;
 
+	//cascade = CascadeType.PERSIST, fetch = FetchType.LAZY
 	//One User for many Order
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne()
 	@JoinColumn(name = "user")
 	private User user;
 
 	//One Order for many OrderRow
+//	@ElementCollection
 	@Column(nullable = false)
-	@OneToMany(mappedBy = "order")			//Något är fiskigt här helt klart och korresponderande i orderRow
-	private List<OrderRow> orderRows;
+	@OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)			//Något är fiskigt här helt klart och korresponderande i orderRow
+	private Collection<OrderRow> orderRows;
+
 
 	protected Order()
 	{
 	}
 
-	public Order(String date, User user)
+	public Order(String date, User user, String status)
 	{
 		this.date = date;
 		this.user = user;
+		this.status = status;
 		this.orderRows = new ArrayList<>();
 	}
 
@@ -100,7 +110,25 @@ public final class Order
 	{
 		return new ArrayList<>(orderRows);
 	}
+	
+	public void setStatus(String status) throws RepositoryException
+	{
+		if (status == "Placed" || status == "Shipped" || status == "Payed"|| status == "Cancelled" )
+		{
+			this.status = status;
+		}
+		else
+		{
+			throw new RepositoryException("Status must be 'Placed', 'Shipped', 'Payed' or 'Cancelled'");
+		}
+	}
 
+	@Override
+	public String toString()
+	{
+		return orderId + " : " + date + " : " + status + " : " + orderRows;
+	}
+	
 	@Override
 	public boolean equals(Object otherObj)
 	{

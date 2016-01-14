@@ -35,16 +35,22 @@ public final class Main
 		// Initiate new product
 		Product product1 = new Product("milk", 33.55, "In Stock");
 		Product product2 = new Product("hat", 10.65, "Out of Stock");
-		Product product3 = new Product("computer", 2000.8, "In Stock");
+		Product product3 = new Product("computer", 20.8, "In Stock");
 		// Product product1 = new Product("Milk", 11L, "In Stock");
 		// Product product2 = new Product("Cola", 14L, "Out of Stock");
 		// Product product3 = new Product("Juice", 17L, "In Stock");
 
 		// Initiate order
-		Order order1 = new Order("20151028", mattias);
+		Order order1 = new Order("20151028", mattias, "Placed");
 		order1.addOrderItems(product1, 5);
 		order1.addOrderItems(product2);
 		order1.addOrderItems(product3, 3);
+
+		// Initiate order 2
+		Order order2 = new Order("20160114", shafi, "Placed");
+		order2.addOrderItems(product1, 3);
+		order2.addOrderItems(product2);
+		order2.addOrderItems(product3, 2);
 
 		// Initiate E-Commerce Service
 		UserRepository userRepository = new JpaUserRepository();
@@ -54,8 +60,7 @@ public final class Main
 
 		// create one or more products and save it in the Database
 		eService.createProduct(product1).createProduct(product2).createProduct(product3);
-		
-		
+
 		//
 		// // get a product by product Id
 		// System.out.println(eService.getProductById(2L));
@@ -69,9 +74,6 @@ public final class Main
 		eService.createUser(shafi);
 		eService.createUser(lina);
 
-		
-		
-		
 		// Find user by id
 		// System.out.println(eService.findUserById(1L).toString());
 		// System.out.println(eService.readUser(shafi));
@@ -100,13 +102,14 @@ public final class Main
 
 		// Update a product specifying product name, what values and which
 		// properties to update
-//		String updateProperty = "updateStatus";
-//		eService.updateProduct("milk", "out of stock", updateProperty);
-		
+		// String updateProperty = "updateStatus";
+		// eService.updateProduct("milk", "out of stock", updateProperty);
+
 		String updateProperty = "updateStatus";
-		eService.updateUser("Mano", "passive", updateProperty);
-		
+		eService.updateUser("Mano", "Passive", updateProperty);
 
 		eService.createOrder(order1);
+		System.out.println(order2.toString());
+		eService.createOrder(order2);
 	}
 }

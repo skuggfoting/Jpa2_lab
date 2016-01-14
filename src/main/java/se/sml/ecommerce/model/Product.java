@@ -8,6 +8,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 
+import se.sml.ecommerce.repository.checkedexception.RepositoryException;
+
 @Entity
 @NamedQueries(value = {
         @NamedQuery(name = "Product.GetAll", query = "SELECT p FROM Product p"),
@@ -25,8 +27,8 @@ public class Product {
 	@Column(nullable = false)
 	private String status;
 	
-//	@OneToOne
-//	private final OrderRow orderRow;
+	@OneToOne(mappedBy = "product")
+	private OrderRow orderRow;
 	
 	public Product() {}
 
@@ -60,8 +62,17 @@ public class Product {
 		this.price = price;
 	}
 	
-	public void setStatus(String status) {
-		this.status = status;
+	public void setStatus(String status) throws RepositoryException
+	{
+
+		if (status == "In stock" || status == "Out of stock")
+		{
+			this.status = status;
+		}
+		else
+		{
+			throw new RepositoryException("Status must be 'in stock' or 'Out of stock'");
+		}
 	}
 	
 	@Override
