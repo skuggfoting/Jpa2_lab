@@ -1,7 +1,6 @@
 package se.sml.ecommerce.repository;
 
 import java.util.Collection;
-import java.util.List;
 
 import se.sml.ecommerce.model.Order;
 import se.sml.ecommerce.model.User;
@@ -9,13 +8,9 @@ import se.sml.ecommerce.repository.checkedexception.RepositoryException;
 
 public interface OrderRepository extends CrudRepository<Order>
 {
-//	Object createOrder(Order order) throws RepositoryException;
+	Collection<Order> getOrderByStatus(String status) throws RepositoryException;
 
-	Collection<List<Order>> getAllOrders() throws RepositoryException;
+	Collection<Order> getOrdersByUsername(User user) throws RepositoryException;
 	
-	List<Order> getOrderByStatus() throws RepositoryException;
-
-	List<Order> getAllOrdersFromUser(User user) throws RepositoryException;
-	
-	List<Order> getOrderByMinValue() throws RepositoryException;
+	Collection<Order> getOrderByMinValue(double sum) throws RepositoryException;
 }

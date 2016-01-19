@@ -1,6 +1,6 @@
 package se.sml.ecommerce.repository;
 
-import java.util.List;
+import java.util.Collection;
 
 import se.sml.ecommerce.repository.checkedexception.RepositoryException;
 
@@ -10,11 +10,9 @@ public interface CrudRepository<T>
 
 	T getById(Long id) throws RepositoryException;
 
-	List<T> getAll() throws RepositoryException;
+	Collection<T> getAll() throws RepositoryException;
 	
 	T getByName(String object) throws RepositoryException;
-	
-//	void update(T object) throws RepositoryException;
-	
-	void update(String namen, Object value, String updateProperty) throws RepositoryException;
+		
+	void update(Long objectName, String updateProperty, Object updatedValue) throws RepositoryException;
 }

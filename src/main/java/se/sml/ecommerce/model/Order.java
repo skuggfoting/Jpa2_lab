@@ -2,11 +2,9 @@ package se.sml.ecommerce.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -16,24 +14,19 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import se.sml.ecommerce.model.OrderRow;
 import se.sml.ecommerce.model.Product;
 import se.sml.ecommerce.repository.checkedexception.RepositoryException;
 
-/*
-- Hämta alla order som har en viss status
-- Hämta alla order med ett visst minimivärde (ex. alla order som har ett värde högre än 10 000kr)
- */
 @Entity
-@Table(name="Orders")
+@Table(name = "Orders")
 @NamedQueries(value = {
 		@NamedQuery(name = "Order.getAllOrders", query = "SELECT e FROM Order e"),
-//		@NamedQuery(name = "Order.getOrderByUsername", query = "SELECT e FROM Order e WHERE e.username = :username"),
-//		@NamedQuery(name = "Order.getOrderByStatus", query = "SELECT e FROM Order e WHERE e.status = : status"),
-//		@NamedQuery(name = "Order.getOrderByMinValue", query = "SELECT e FROM Order e WHERE e.status = : status")
+		@NamedQuery(name = "Order.getOrdersByUsername", query = "SELECT e FROM Order e WHERE e.user = :user"),
+		@NamedQuery(name = "Order.getOrderByStatus", query = "SELECT e FROM Order e WHERE e.status = :status"),
+		@NamedQuery(name = "Order.getOrderByMinValue", query = "SELECT e FROM Order e WHERE e.sum >= :sum")
 })
 
 public final class Order
@@ -49,18 +42,15 @@ public final class Order
 	@Column
 	private String status;
 
-	//cascade = CascadeType.PERSIST, fetch = FetchType.LAZY
-	//One User for many Order
+	// One User for many Order
 	@ManyToOne()
 	@JoinColumn(name = "user")
 	private User user;
 
-	//One Order for many OrderRow
-//	@ElementCollection
+	// One Order for many OrderRow
 	@Column(nullable = false)
-	@OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)			//Något är fiskigt här helt klart och korresponderande i orderRow
+	@OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
 	private Collection<OrderRow> orderRows;
-
 
 	protected Order()
 	{
@@ -94,26 +84,26 @@ public final class Order
 	}
 
 	// add any product of one piece
-	public void addOrderItems(Product product)
+	public void addOrderRow(Product product)
 	{
-		addOrderItems(product, 1);
+		addOrderRow(product, 1);
 
 	}
 
 	// add products of multiple pieces
-	public void addOrderItems(Product product, int i)
+	public void addOrderRow(Product product, int i)
 	{
 		orderRows.add(new OrderRow(product, i));
 	}
 
-	public List<OrderRow> getOrderRows()
+	public Collection<OrderRow> getOrderRows()
 	{
 		return new ArrayList<>(orderRows);
 	}
-	
+
 	public void setStatus(String status) throws RepositoryException
 	{
-		if (status == "Placed" || status == "Shipped" || status == "Payed"|| status == "Cancelled" )
+		if (status == "Placed" || status == "Shipped" || status == "Payed" || status == "Cancelled")
 		{
 			this.status = status;
 		}
@@ -123,12 +113,18 @@ public final class Order
 		}
 	}
 
+	public void setDate(String date)
+	{
+		this.date = date;
+		
+	}
+	
 	@Override
 	public String toString()
 	{
 		return orderId + " : " + date + " : " + status + " : " + orderRows;
 	}
-	
+
 	@Override
 	public boolean equals(Object otherObj)
 	{
@@ -153,4 +149,5 @@ public final class Order
 		result += 37 * user.getUsername().hashCode();
 		return result;
 	}
+
 }

@@ -1,21 +1,9 @@
-/*
-- Hämta en user med ett visst id
-- Hämta alla users
-- Hämta en user med ett visst username
-- Skapa en ny user
-- Uppdatera en user
-- Ändra status på en user (välj själv passande statusar)
-
- */
-
 package se.sml.ecommerce.model;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -40,26 +28,25 @@ public final class User
 	@Column(unique = true, nullable = false)
 	private String username;
 	@Column(nullable = false)
-//	private String firstName;
-//	@Column(nullable = false)
 	private String password;
 	@Column(nullable = false)
 	private String status;
 
-	//Many Order for one User
-//	@ElementCollection
-	@OneToMany(mappedBy="user")
+	// Many Order for one User
+	@OneToMany(mappedBy = "user")
 	private Collection<Order> order;
-	
+
 	protected User()
 	{
 	}
 
-	public User(String username, String password, String status)
+	public User(String username, String password, String status) throws RepositoryException
 	{
 		this.username = username;
 		this.password = password;
-		this.status = status;
+
+		setStatus(status);
+
 	}
 
 	public long getUserId()
@@ -81,7 +68,7 @@ public final class User
 	{
 		return status;
 	}
-	
+
 	public Collection<Order> getOrder()
 	{
 		return new HashSet<>(order);

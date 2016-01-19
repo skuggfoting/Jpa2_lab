@@ -1,10 +1,6 @@
 package se.sml.ecommerce;
 
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import java.util.Collection;
 
 import se.sml.ecommerce.model.Order;
 import se.sml.ecommerce.model.Product;
@@ -19,38 +15,40 @@ import se.sml.ecommerce.repository.storage.JpaUserRepository;
 
 public final class Main
 {
-
-	// private static final EntityManagerFactory factory =
-	// Persistence.createEntityManagerFactory("PersistenceUnit");
-
 	public static void main(String[] args) throws RepositoryException
 	{
 
 		// Initiate new user
-		User mattias = new User("Mano", "1234", "active");
-		User shafi = new User("Shab", "5678", "active");
-		User lina = new User("Lica", "1357", "passive");
+		User mattias = new User("Mano", "1234", "Active");
+		User shafi = new User("Shab", "5678", "Active");
+		User lina = new User("Lica", "1357", "Passive");
 		// User lina2 = new User("991212", "Lina Carlén", "lamborgini");
 
 		// Initiate new product
-		Product product1 = new Product("milk", 33.55, "In Stock");
-		Product product2 = new Product("hat", 10.65, "Out of Stock");
-		Product product3 = new Product("computer", 20.8, "In Stock");
+		Product product1 = new Product("milk", 33.55, "In stock");
+		Product product2 = new Product("hat", 10.65, "Out of stock");
+		Product product3 = new Product("computer", 20.8, "In stock");
 		// Product product1 = new Product("Milk", 11L, "In Stock");
 		// Product product2 = new Product("Cola", 14L, "Out of Stock");
 		// Product product3 = new Product("Juice", 17L, "In Stock");
 
 		// Initiate order
 		Order order1 = new Order("20151028", mattias, "Placed");
-		order1.addOrderItems(product1, 5);
-		order1.addOrderItems(product2);
-		order1.addOrderItems(product3, 3);
+		order1.addOrderRow(product1, 5);
+		order1.addOrderRow(product2);
+		order1.addOrderRow(product3, 3);
 
 		// Initiate order 2
 		Order order2 = new Order("20160114", shafi, "Placed");
-		order2.addOrderItems(product1, 3);
-		order2.addOrderItems(product2);
-		order2.addOrderItems(product3, 2);
+		order2.addOrderRow(product1, 3);
+		order2.addOrderRow(product2);
+		order2.addOrderRow(product3, 2);
+
+		// Initiate order 2
+		Order order3 = new Order("20160115", mattias, "Shipped");
+		order3.addOrderRow(product1, 3);
+		order3.addOrderRow(product2);
+		order3.addOrderRow(product3, 2);
 
 		// Initiate E-Commerce Service
 		UserRepository userRepository = new JpaUserRepository();
@@ -58,36 +56,91 @@ public final class Main
 		OrderRepository orderRepository = new JpaOrderRepository();
 		ECommerceService eService = new ECommerceService(userRepository, productRepository, orderRepository);
 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// PRODUCT KOD HÄR UNDER:
+
 		// create one or more products and save it in the Database
 		eService.createProduct(product1).createProduct(product2).createProduct(product3);
 
-		//
-		// // get a product by product Id
-		// System.out.println(eService.getProductById(2L));
-		//
-		// // get a product by product Name. Fetches a single product because
-		// each product name is unique.
-		// System.out.println(eService.getProductByName("AA"));
+		// Update product
+		eService.updateProduct(1L, "updateStatus", "Out of stock");
 
-		// Create user
-		eService.createUser(mattias);
-		eService.createUser(shafi);
-		eService.createUser(lina);
+		// Get a product by product Id
+		System.out.println(eService.getProductById(2L) + "\n");
 
-		// Find user by id
-		// System.out.println(eService.findUserById(1L).toString());
-		// System.out.println(eService.readUser(shafi));
-		// System.out.println(eService.readUser(lina));
+		// Get all products
+		Collection<Product> products = eService.getAllProducts();
+		for (Product product : products)
+		{
+			System.out.println(product.toString());
+		}
+//		System.out.println(eService.getAllProduct() + "\n");
 
+		// Get product by product name
+		System.out.println("\n" + eService.getProductByName("milk") + "\n");
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// USER KOD HÄR UNDER:
+
+		// Create users
+		eService.createUser(mattias).createUser(shafi).createUser(lina);
+
+		// Update user
+		eService.updateUser(4L, "Passive", "updateStatus");
+		
+		// Get an user by user Id
+		System.out.println(eService.getUserById(4L) + "\n");
+		
 		// Get all users
-		List<User> users = eService.getAllUsers();
+		Collection<User> users = eService.getAllUsers();
 		for (User user : users)
 		{
 			System.out.println(user.toString());
 		}
-
+//		System.out.println("bajs: "+eService.getAllUsers());
+		
 		// Get user by username
-		System.out.println(eService.getByUsername("Shab").toString());
+		System.out.println("\n" + eService.getByUsername("mano") + "\n");
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// ORDER KOD HÄR UNDER:		
+		
+		// Create orders
+		eService.createOrder(order1);
+		eService.createOrder(order2);
+		eService.createOrder(order3);
+		
+		// Update order
+		eService.updateOrder(7L, "updateStatus", "Shipped");
+		
+		// Get order by Id
+		System.out.println("1: " + eService.getOrderById(7L) + "\n");
+
+		// Get all orders
+		System.out.println("2: " + eService.getAllOrders() + "\n");
+
+		// Get all orders for specific user
+		System.out.println("3: " + eService.getAllOrders(mattias) + "\n");
+
+		// Get order by status
+		System.out.println("4: " + eService.getOrderByStatus("Placed") + "\n");
+
+		// Get order by min value
+		System.out.println("5: " + eService.getOrderByMinValue(100) + "\n");
+		
+//
+//		// Get all users
+//		Collection<User> users = eService.getAllUsers();
+//		for (User user : users)
+//		{
+//			System.out.println(user.toString());
+//		}
+
+//		// Get user by username
+//		System.out.println(eService.getByUsername("Shab").toString());
+//
+//		// Get by Id
+//		System.out.println(eService.getUserById(4L).toString());
 
 		// // update user
 		// mattias.setUsername("MattiasN");
@@ -105,11 +158,23 @@ public final class Main
 		// String updateProperty = "updateStatus";
 		// eService.updateProduct("milk", "out of stock", updateProperty);
 
-		String updateProperty = "updateStatus";
-		eService.updateUser("Mano", "Passive", updateProperty);
 
-		eService.createOrder(order1);
-		System.out.println(order2.toString());
-		eService.createOrder(order2);
+//		eService.createOrder(order1);
+//		eService.createOrder(order2);
+//		eService.createOrder(order3);
+//		System.out.println(order2.toString());
+//
+//		System.out.println("1: " + eService.getAllUsers());
+//
+//		System.out.println("2: " + eService.getOrderById(7L));
+//
+//		System.out.println("3: " + eService.getAllOrders());
+//
+//		System.out.println("4: " + eService.getAllOrders(4L));
+//
+//		System.out.println("5: " + eService.getOrderByStatus("Placed"));
+//
+//		System.out.println("6: " + eService.getOrderByMinValue(100));
+
 	}
 }

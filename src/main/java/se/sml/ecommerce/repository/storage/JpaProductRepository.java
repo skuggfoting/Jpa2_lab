@@ -1,6 +1,6 @@
 package se.sml.ecommerce.repository.storage;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -64,10 +64,10 @@ public class JpaProductRepository implements ProductRepository {
 	
 	// Get all products in the database
 	@Override
-	public List<Product> getAll() throws RepositoryException {
+	public Collection<Product> getAll() throws RepositoryException {
 		try{
 			EntityManager manager = factory.createEntityManager();
-			List<Product> products = manager.createNamedQuery("Product.GetAll", Product.class).getResultList();
+			Collection<Product> products = manager.createNamedQuery("Product.GetAll", Product.class).getResultList();
 			manager.close();
 			return products;
 		}
@@ -79,21 +79,21 @@ public class JpaProductRepository implements ProductRepository {
 
 	// Update a product specifying product name, what values and which properties to update
 	@Override
-	public void update(String name, Object value, String updateProperty) throws RepositoryException
+	public void update(Long objectId, String updateProperty, Object updatedValue) throws RepositoryException
 	{
 		try
 		{
 			EntityManager manager = factory.createEntityManager();
-			Product product = getByName(name);
+			Product product = getById(objectId);
 
 			switch (updateProperty)
 			{
 			case ("updatePrice"):
-				Long price = (Long) value;
+				Long price = (Long) updatedValue;
 				product.setPrice(price);
 				break;
 			case ("updateStatus"):
-				String status = (String) value;
+				String status = (String) updatedValue;
 				product.setStatus(status);
 				break;
 			}

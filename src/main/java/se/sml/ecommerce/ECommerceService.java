@@ -1,8 +1,6 @@
 package se.sml.ecommerce;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 
 import se.sml.ecommerce.model.Order;
 import se.sml.ecommerce.model.Product;
@@ -25,18 +23,17 @@ public final class ECommerceService
 		this.userRepository = userRepository;
 		this.productRepository = productRepository;
 		this.orderRepository = orderRepository;
-		// this.orderRepository = orderRepository;
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// USER KOD HÄR UNDER:
 
-	public User createUser(User user)
+	public ECommerceService createUser(User user)
 	{
 		try
 		{
 			userRepository.create(user);
-			return user;
+			return this;
 		}
 		catch (RepositoryException e)
 		{
@@ -45,11 +42,11 @@ public final class ECommerceService
 
 	}
 
-	public void updateUser(String username, Object value, String updateProperty)
+	public void updateUser(Long userId, String updateProperty, Object updatedValue)
 	{
 		try
 		{
-			userRepository.update(username, value, updateProperty);
+			userRepository.update(userId, updateProperty, updatedValue);
 		}
 		catch (RepositoryException e)
 		{
@@ -57,55 +54,7 @@ public final class ECommerceService
 		}
 	}
 
-	// public boolean updateUser(User user)
-	// {
-	// try
-	// {
-	// userRepository.update(user);
-	// return true;
-	// }
-	// catch (RepositoryException e)
-	// {
-	// throw new ECommerceServiceException("Can't update user that does not
-	// exist");
-	// }
-	// }
-
-	// private boolean correctUserName(User user)
-	// {
-	// if (user.getUsername().trim().length() <= 30 && user.getUsername() !=
-	// null)
-	// {
-	// if (checkPassword(user.getPassword()))
-	// {
-	// return true;
-	// }
-	// }
-	// return false;
-	// }
-	//
-	// private boolean checkPassword(String password)
-	// {
-	// // Regular expressions eller en if till
-	// char a;
-	// int count = 0;
-	// assert password != null;
-	// for (int i = 0; i < password.length(); i++)
-	// {
-	// a = password.charAt(i);
-	// if (!Character.isLetterOrDigit(a))
-	// {
-	// return false;
-	// }
-	// else if (Character.isDigit(a))
-	// {
-	// count++;
-	// }
-	// }
-	// return count >= 2;
-	// }
-
-	public User findUserById(long userId)
+	public User getUserById(long userId)
 	{
 		try
 		{
@@ -129,28 +78,7 @@ public final class ECommerceService
 		}
 	}
 
-	// public boolean setStatus(User user)
-	// {
-	// try
-	// {
-	// if (correctUserName(user) && userRepository.getByName(user.getUsername())
-	// != null)
-	// {
-	// userRepository.update(user);
-	// return true;
-	// }
-	// else
-	// {
-	// throw new ECommerceServiceException("User doesn't exist");
-	// }
-	// }
-	// catch (RepositoryException e)
-	// {
-	// throw new ECommerceServiceException("User doesn't exist");
-	// }
-	// }
-
-	public List<User> getAllUsers()
+	public Collection<User> getAllUsers()
 	{
 		try
 		{
@@ -166,7 +94,6 @@ public final class ECommerceService
 	// PRODUCT KOD HÄR UNDER:
 
 	// create one or more products
-	// create one or more products //create
 	public ECommerceService createProduct(Product product)
 	{
 		try
@@ -218,7 +145,7 @@ public final class ECommerceService
 	}
 
 	// get all product
-	public List<Product> getAllProduct()
+	public Collection<Product> getAllProducts()
 	{
 		try
 		{
@@ -232,11 +159,12 @@ public final class ECommerceService
 
 	// Update a product specifying product name, what values and which
 	// properties to update
-	public void updateProduct(String prodName, Object value, String updateProperty)
+
+	public void updateProduct(Long productId, String updateProperty, Object updatedValue)
 	{
 		try
 		{
-			productRepository.update(prodName, value, updateProperty);
+			productRepository.update(productId, updateProperty, updatedValue);
 		}
 		catch (RepositoryException e)
 		{
@@ -247,14 +175,14 @@ public final class ECommerceService
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ORDER KOD HÄR UNDER:
 
-	public Order createOrder(Order order)
+	public ECommerceService createOrder(Order order)
 	{
 		if (correctOrder(order))
 		{
 			try
 			{
 				orderRepository.create(order);
-				return order;
+				return this;
 			}
 			catch (RepositoryException e)
 			{
@@ -276,48 +204,35 @@ public final class ECommerceService
 		return false;
 	}
 
-	// public Order findOrderById(String orderId)
-	// {
-	// try
-	// {
-	// return orderRepository.get(orderId);
-	// }
-	// catch (RepositoryException e)
-	// {
-	// throw new ECommerceServiceException("No such order");
-	// }
-	// }
-	//
-	// public void deleteOrder(String orderId)
-	// {
-	// try
-	// {
-	// orderRepository.delete(orderId);
-	// }
-	// catch (RepositoryException e)
-	// {
-	// throw new ECommerceServiceException("No such order");
-	// }
-	// }
-
-//	public Order updateOrder(Order order)
-//	{
-//		try
-//		{
-//			orderRepository.update(order);
-//			return order;
-//		}
-//		catch (RepositoryException e)
-//		{
-//			throw new ECommerceServiceException("No such order");
-//		}
-//	}
-
-	public Collection<List<Order>> getAllOrders()
+	public Order getOrderById(Long orderId)
 	{
 		try
 		{
-			return orderRepository.getAllOrders();
+			return orderRepository.getById(orderId);
+		}
+		catch (RepositoryException e)
+		{
+			throw new ECommerceServiceException("No such order");
+		}
+	}
+
+	public void updateOrder(Long orderId, String updateProperty, Object updatedValue)
+	{
+		try
+		{
+			orderRepository.update(orderId, updateProperty, updatedValue);
+		}
+		catch (RepositoryException e)
+		{
+			throw new ECommerceServiceException("No such order");
+		}
+	}
+
+	public Collection<Order> getAllOrders()
+	{
+		try
+		{
+			return orderRepository.getAll();
 		}
 		catch (RepositoryException e)
 		{
@@ -325,11 +240,35 @@ public final class ECommerceService
 		}
 	}
 
-	public List<Order> getAllOrders(User user)
+	public Collection<Order> getAllOrders(User user)
 	{
 		try
 		{
-			return orderRepository.getAllOrdersFromUser(user);
+			return orderRepository.getOrdersByUsername(user);
+		}
+		catch (RepositoryException e)
+		{
+			throw new ECommerceServiceException("No such user or no order");
+		}
+	}
+
+	public Collection<Order> getOrderByStatus(String status)
+	{
+		try
+		{
+			return orderRepository.getOrderByStatus(status);
+		}
+		catch (RepositoryException e)
+		{
+			throw new ECommerceServiceException("No such user or no order");
+		}
+	}
+
+	public Collection<Order> getOrderByMinValue(double sum)
+	{
+		try
+		{
+			return orderRepository.getOrderByMinValue(sum);
 		}
 		catch (RepositoryException e)
 		{

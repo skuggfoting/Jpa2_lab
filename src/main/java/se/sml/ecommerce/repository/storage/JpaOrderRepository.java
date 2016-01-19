@@ -1,11 +1,12 @@
 package se.sml.ecommerce.repository.storage;
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 
 import se.sml.ecommerce.model.Order;
 import se.sml.ecommerce.model.User;
@@ -15,75 +16,92 @@ import se.sml.ecommerce.repository.checkedexception.RepositoryException;
 public class JpaOrderRepository implements OrderRepository
 {
 
-	// private HashMap<String, Object> userMap = new HashMap<>();
-
 	private static final EntityManagerFactory factory = Persistence.createEntityManagerFactory("PersistenceUnit");
-
-	// EntityManager manager = factory.createEntityManager();
 
 	@Override
 	public void create(Order order) throws RepositoryException
 	{
-		EntityManager manager = factory.createEntityManager();
-		manager.getTransaction().begin();
+		try
+		{
+			EntityManager manager = factory.createEntityManager();
+			manager.getTransaction().begin();
 
-		manager.persist(order);
+			manager.persist(order);
 
-		manager.getTransaction().commit();
-		manager.close();
+			manager.getTransaction().commit();
+			manager.close();
 
-		manager = factory.createEntityManager();
+			manager = factory.createEntityManager();
+		}
+		catch (PersistenceException e)
+		{
+			throw new RepositoryException();
+		}
 	}
 
 	@Override
 	public Order getById(Long orderId) throws RepositoryException
 	{
-		EntityManager manager = factory.createEntityManager();
-		Order order = manager.find(Order.class, orderId);
-		manager.close();
-		return order;
+		try
+		{
+			EntityManager manager = factory.createEntityManager();
+			Order order = manager.find(Order.class, orderId);
+			manager.close();
+			return order;
+		}
+		catch (IllegalArgumentException e)
+		{
+			throw new RepositoryException();
+		}
 	}
 
 	@Override
-	public List<Order> getAll() throws RepositoryException
+	public Collection<Order> getAll() throws RepositoryException
 	{
 		EntityManager manager = factory.createEntityManager();
-		List<Order> order = manager.createNamedQuery("Order.getAll", Order.class).getResultList();
+		Collection<Order> orders = manager.createNamedQuery("Order.getAllOrders", Order.class).getResultList();
 		manager.close();
-		return order;
+		return orders;
 	}
 
 	@Override
 	public Order getByName(String username) throws RepositoryException
 	{
-		EntityManager manager = factory.createEntityManager();
-		Order order = manager.createNamedQuery("Order.getByUsername", Order.class).setParameter("username", username).getSingleResult();
-		manager.close();
-		return order;
+		try
+		{
+			EntityManager manager = factory.createEntityManager();
+			Order order = manager.createNamedQuery("Order.getByUsername", Order.class).setParameter("username", username).getSingleResult();
+			manager.close();
+			return order;
+		}
+		catch (NoResultException e)
+		{
+			throw new RepositoryException();
+		}
 	}
 
 	// Update an order specifying username, what values and which properties to
 	@Override
-	public void update(String name, Object value, String updateProperty) throws RepositoryException
+	public void update(Long userId, String updateProperty, Object updatedValue) throws RepositoryException
 	{
 		try
 		{
 			EntityManager manager = factory.createEntityManager();
-			Order order = getByName(name);
+			Order order = getById(userId);
 
 			switch (updateProperty)
 			{
-			case ("updateUsername"):
-				String username = (String) value;
-//				order.setPassword(username);
+			case ("updateDate"):
+				String date = (String) updatedValue;
+				order.setDate(date);
 				break;
-			case ("updatePassword"):
-				String password = (String) value;
-//				order.setPassword(password);
+			case ("updateOrderRow"):
+//				String password = (String) updatedValue;
+//				order.addOrderRow((Product)updatedValue);;
 				break;
 			case ("updateStatus"):
-				String status = (String) value;
-//				order.setStatus(status);
+				String status = (String) updatedValue;
+				order.setStatus(status);
 				break;
 			}
 
@@ -99,34 +117,57 @@ public class JpaOrderRepository implements OrderRepository
 		}
 	}
 
-
-	@Override
-	public Collection<List<Order>> getAllOrders() throws RepositoryException
+	public Collection<Order> getOrderByStatus(String status) throws RepositoryException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		try
+		{
+			EntityManager manager = factory.createEntityManager();
+			Collection<Order> orders = manager.createNamedQuery("Order.getOrderByStatus", Order.class).setParameter("status", status).getResultList();
+			manager.close();
+
+			if (orders.isEmpty() == false)
+			{
+				return orders;
+			}
+			else
+			{
+				throw new RepositoryException();
+			}
+		}
+		catch (NoResultException e)
+		{
+			throw new RepositoryException();
+		}
 	}
 
-	public List<Order> getOrderByStatus() throws RepositoryException
+	public Collection<Order> getOrdersByUsername(User user) throws RepositoryException
+	{
+		try
+		{
+			EntityManager manager = factory.createEntityManager();
+			Collection<Order> orders = manager.createNamedQuery("Order.getOrdersByUsername", Order.class).setParameter("user", user).getResultList();
+			manager.close();
+			
+			if (orders.isEmpty() == false)
+			{
+				return orders;
+			}
+			else
+			{
+				throw new RepositoryException();
+			}
+		}
+		catch (NoResultException e)
+		{
+			throw new RepositoryException();
+		}
+	}
+
+	public Collection<Order> getOrderByMinValue(double sum) throws RepositoryException
 	{
 		EntityManager manager = factory.createEntityManager();
-		List<Order> order = manager.createNamedQuery("Order.getOrderByStatus", Order.class).getResultList();
+		Collection<Order> orders = manager.createNamedQuery("Order.getOrderByMinValue", Order.class).setParameter("sum", sum).getResultList();
 		manager.close();
-		return order;
-	}
-
-	@Override
-	public List<Order> getAllOrdersFromUser(User user) throws RepositoryException
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<Order> getOrderByMinValue() throws RepositoryException
-	{
-		EntityManager manager = factory.createEntityManager();
-		List<Order> order = manager.createNamedQuery("Order.getOrderByMinValue", Order.class).getResultList();
-		manager.close();
-		return order;
+		return orders;
 	}
 }

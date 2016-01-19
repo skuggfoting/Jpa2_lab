@@ -1,12 +1,9 @@
 package se.sml.ecommerce.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -15,24 +12,20 @@ public final class OrderRow
 	@Id
 	@GeneratedValue
 	private long id;
-	
+
 	@Column(nullable = false)
 	private int quantity;
 	@Column
 	private double sum;
-	
-	//Many OrderRow for one Order
-//	@OneToMany(mappedBy = "orderRows")
-//	private Order order;
-//	
-	//One Product to one OrderRow
+
+	// One Product to one OrderRow
 	@OneToOne()
 	private Product product;
 
 	protected OrderRow()
 	{
 	}
-	
+
 	public OrderRow(Product product, int quantity)
 	{
 		this.quantity = quantity;
