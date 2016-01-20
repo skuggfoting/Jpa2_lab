@@ -9,7 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -20,11 +19,10 @@ import se.sml.ecommerce.model.OrderRow;
 import se.sml.ecommerce.model.Product;
 import se.sml.ecommerce.repository.checkedexception.RepositoryException;
 
-@Entity
+@Entity //Name kan ligga här istället
 @Table(name = "Orders")
 @NamedQueries(value = {
 		@NamedQuery(name = "Order.getAllOrders", query = "SELECT e FROM Order e"),
-		@NamedQuery(name = "Order.getOrdersByUsername", query = "SELECT e FROM Order e WHERE e.user = :user"),
 		@NamedQuery(name = "Order.getOrderByStatus", query = "SELECT e FROM Order e WHERE e.status = :status"),
 		@NamedQuery(name = "Order.getOrderByMinValue", query = "SELECT e FROM Order e WHERE e.sum >= :sum")
 })
@@ -44,7 +42,6 @@ public final class Order
 
 	// One User for many Order
 	@ManyToOne()
-	@JoinColumn(name = "user")
 	private User user;
 
 	// One Order for many OrderRow
@@ -116,9 +113,9 @@ public final class Order
 	public void setDate(String date)
 	{
 		this.date = date;
-		
+
 	}
-	
+
 	@Override
 	public String toString()
 	{

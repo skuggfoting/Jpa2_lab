@@ -29,9 +29,7 @@ public class JpaOrderRepository implements OrderRepository
 			manager.persist(order);
 
 			manager.getTransaction().commit();
-			manager.close();
-
-			manager = factory.createEntityManager();
+			manager.close(); //Skall ligga i ett finally-block, manager utanför
 		}
 		catch (PersistenceException e)
 		{
@@ -116,6 +114,27 @@ public class JpaOrderRepository implements OrderRepository
 			throw new RepositoryException(e);
 		}
 	}
+	
+/////////////// ALTERNATIV UPDATE!!!		
+	public Order update2(Order order) throws RepositoryException
+	{
+		try
+		{
+			EntityManager manager = factory.createEntityManager();
+			manager.getTransaction().begin();
+
+			manager.merge(order);
+
+			manager.getTransaction().commit();
+			manager.close();
+
+			return order;
+		}
+		catch (PersistenceException e)
+		{
+			throw new RepositoryException();
+		}
+	}
 
 	public Collection<Order> getOrderByStatus(String status) throws RepositoryException
 	{
@@ -140,17 +159,17 @@ public class JpaOrderRepository implements OrderRepository
 		}
 	}
 
-	public Collection<Order> getOrdersByUsername(User user) throws RepositoryException
+	public Collection<Order> getOrdersByUserId(Long userId) throws RepositoryException
 	{
 		try
 		{
 			EntityManager manager = factory.createEntityManager();
-			Collection<Order> orders = manager.createNamedQuery("Order.getOrdersByUsername", Order.class).setParameter("user", user).getResultList();
+			User user = manager.createNamedQuery("User.getOrdersByUserId", User.class).setParameter("id", userId).getSingleResult();
 			manager.close();
-			
-			if (orders.isEmpty() == false)
+
+			if (user.getOrder().isEmpty() == false)
 			{
-				return orders;
+				return user.getOrder();
 			}
 			else
 			{

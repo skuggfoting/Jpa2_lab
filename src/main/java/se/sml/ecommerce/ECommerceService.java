@@ -9,7 +9,7 @@ import se.sml.ecommerce.repository.OrderRepository;
 import se.sml.ecommerce.repository.ProductRepository;
 import se.sml.ecommerce.repository.UserRepository;
 import se.sml.ecommerce.repository.checkedexception.RepositoryException;
-import se.sml.ecommerce.repository.uncheckedexception.ECommerceServiceException;
+import se.sml.ecommerce.uncheckedexception.ECommerceServiceException;
 
 public final class ECommerceService
 {
@@ -228,6 +228,19 @@ public final class ECommerceService
 		}
 	}
 
+	/////////////// ALTERNATIV UPDATE!!!
+	public Order updateOrder2(Order order)
+	{
+		try
+		{
+			return orderRepository.update2(order);
+		}
+		catch (RepositoryException e)
+		{
+			throw new ECommerceServiceException("No such order");
+		}
+	}
+
 	public Collection<Order> getAllOrders()
 	{
 		try
@@ -240,11 +253,11 @@ public final class ECommerceService
 		}
 	}
 
-	public Collection<Order> getAllOrders(User user)
+	public Collection<Order> getAllOrders(Long userId)
 	{
 		try
 		{
-			return orderRepository.getOrdersByUsername(user);
+			return orderRepository.getOrdersByUserId(userId);
 		}
 		catch (RepositoryException e)
 		{

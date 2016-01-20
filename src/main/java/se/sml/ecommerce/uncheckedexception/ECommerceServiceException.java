@@ -1,4 +1,4 @@
-package se.sml.ecommerce.repository.uncheckedexception;
+package se.sml.ecommerce.uncheckedexception;
 
 public class ECommerceServiceException extends RuntimeException
 {

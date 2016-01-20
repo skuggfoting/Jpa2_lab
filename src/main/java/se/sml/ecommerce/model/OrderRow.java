@@ -28,8 +28,8 @@ public final class OrderRow
 
 	public OrderRow(Product product, int quantity)
 	{
-		this.quantity = quantity;
 		this.product = product;
+		this.quantity = quantity;
 	}
 
 	public int getQuantity()
@@ -41,6 +41,12 @@ public final class OrderRow
 	{
 		sum = quantity * product.getPrice();
 		return sum;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return id + " : " + quantity + " : " + sum + " : " + product;
 	}
 
 	@Override

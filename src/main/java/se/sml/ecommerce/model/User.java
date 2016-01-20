@@ -16,7 +16,8 @@ import se.sml.ecommerce.repository.checkedexception.RepositoryException;
 @Entity
 @NamedQueries(value = {
 		@NamedQuery(name = "User.getAll", query = "SELECT e FROM User e"),
-		@NamedQuery(name = "User.getByUsername", query = "SELECT e FROM User e WHERE e.username = :username")
+		@NamedQuery(name = "User.getByUsername", query = "SELECT e FROM User e WHERE e.username = :username"),
+		@NamedQuery(name = "User.getOrdersByUserId", query = "SELECT e FROM User e JOIN FETCH e.order WHERE e.id = :id")
 })
 
 public final class User

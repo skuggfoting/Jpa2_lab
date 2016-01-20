@@ -27,7 +27,7 @@ public class Product
 	@Column(nullable = false)
 	private String status;
 
-	public Product()
+	protected Product()
 	{
 	}
 
